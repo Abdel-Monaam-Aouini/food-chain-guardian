@@ -9,9 +9,22 @@ import SupplyChainMap from "./SupplyChainMap";
 import RecentActivity from "./RecentActivity";
 import { Button } from "@/components/ui/button";
 import { QrCode, Filter, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [selectedProduct, setSelectedProduct] = useState(products[0]);
+  const navigate = useNavigate();
+
+  const handleProductClick = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+    }
+  };
+
+  const handleViewProduct = (productId: string) => {
+    navigate(`/product/${productId}`);
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -32,6 +45,7 @@ const Dashboard = () => {
           </Button>
           <Button 
             className="bg-guardian-green-500 hover:bg-guardian-green-600 text-white flex items-center gap-2"
+            onClick={() => navigate("/add-product")}
           >
             <QrCode className="h-4 w-4" />
             <span>New Scan</span>
@@ -56,6 +70,7 @@ const Dashboard = () => {
                 <Button 
                   variant="ghost" 
                   className="text-sm text-guardian-blue-500 flex items-center gap-1"
+                  onClick={() => navigate("/products")}
                 >
                   View All
                   <ArrowRight className="h-3 w-3 ml-1" />
@@ -65,12 +80,27 @@ const Dashboard = () => {
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {products.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
+                  <div
+                    key={product.id}
                     className="cursor-pointer transition-all"
-                    onClick={() => setSelectedProduct(product)}
-                  />
+                    onClick={() => handleProductClick(product.id)}
+                  >
+                    <ProductCard 
+                      product={product}
+                      className="h-full"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2 text-guardian-blue-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewProduct(product.id);
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </div>
                 ))}
               </div>
             </CardContent>
@@ -127,6 +157,7 @@ const Dashboard = () => {
                 <div className="pt-2 border-t border-gray-100">
                   <Button 
                     className="w-full bg-guardian-blue-500 hover:bg-guardian-blue-600 text-white mt-2"
+                    onClick={() => handleViewProduct(selectedProduct.id)}
                   >
                     View Complete History
                   </Button>
