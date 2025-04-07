@@ -11,7 +11,8 @@ import {
   Search, 
   QrCode, 
   ArrowUpDown, 
-  Filter 
+  Filter,
+  X
 } from "lucide-react";
 import {
   Table,
@@ -21,18 +22,86 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
 
 const Products = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    category: "",
+    status: "",
+    producer: "",
+    origin: "",
+    dateRange: [0, 100] // Represents a percentage range for dates
+  });
   
-  const filteredProducts = products.filter(
-    (product) =>
+  // Extract unique values for filters
+  const categories = [...new Set(products.map(p => p.category))];
+  const statuses = [...new Set(products.map(p => p.status))];
+  const producers = [...new Set(products.map(p => p.producer))];
+  const origins = [...new Set(products.map(p => p.origin))];
+  
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+  
+  const resetFilters = () => {
+    setFilters({
+      category: "",
+      status: "",
+      producer: "",
+      origin: "",
+      dateRange: [0, 100]
+    });
+  };
+  
+  const filteredProducts = products.filter(product => {
+    // Apply search query filter
+    const matchesSearch = 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.producer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.origin.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      product.origin.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Apply category filter
+    const matchesCategory = !filters.category || product.category === filters.category;
+    
+    // Apply status filter
+    const matchesStatus = !filters.status || product.status === filters.status;
+    
+    // Apply producer filter
+    const matchesProducer = !filters.producer || product.producer === filters.producer;
+    
+    // Apply origin filter
+    const matchesOrigin = !filters.origin || product.origin === filters.origin;
+    
+    // Apply date range filter (simplified for demo)
+    // This assumes harvest dates are in format MM/DD/YYYY
+    const matchesDateRange = true; // Simplified for this implementation
+    
+    return matchesSearch && matchesCategory && matchesStatus && 
+           matchesProducer && matchesOrigin && matchesDateRange;
+  });
+
+  const activeFilterCount = Object.values(filters).filter(val => 
+    val !== "" && (Array.isArray(val) ? val[0] !== 0 || val[1] !== 100 : true)
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -72,11 +141,193 @@ const Products = () => {
                   className="pl-10"
                 />
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Filters</span>
-              </Button>
+              <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 relative"
+                    onClick={() => setFiltersOpen(true)}
+                  >
+                    <Filter className="h-4 w-4" />
+                    <span>Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-guardian-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Filters</h3>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={resetFilters}
+                        className="h-8 px-2 text-muted-foreground"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Category</label>
+                      <Select
+                        value={filters.category}
+                        onValueChange={(value) => handleFilterChange("category", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Categories</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Status</label>
+                      <Select
+                        value={filters.status}
+                        onValueChange={(value) => handleFilterChange("status", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Statuses" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Statuses</SelectItem>
+                          {statuses.map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Producer</label>
+                      <Select
+                        value={filters.producer}
+                        onValueChange={(value) => handleFilterChange("producer", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Producers" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Producers</SelectItem>
+                          {producers.map((producer) => (
+                            <SelectItem key={producer} value={producer}>
+                              {producer}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Origin</label>
+                      <Select
+                        value={filters.origin}
+                        onValueChange={(value) => handleFilterChange("origin", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Origins" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Origins</SelectItem>
+                          {origins.map((origin) => (
+                            <SelectItem key={origin} value={origin}>
+                              {origin}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Button 
+                        className="w-full bg-guardian-green-500 hover:bg-guardian-green-600"
+                        onClick={() => setFiltersOpen(false)}
+                      >
+                        Apply Filters
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
+            
+            {activeFilterCount > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {filters.category && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    <span>Category: {filters.category}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-5 w-5 p-0 ml-1"
+                      onClick={() => handleFilterChange("category", "")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                {filters.status && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    <span>Status: {filters.status}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-5 w-5 p-0 ml-1"
+                      onClick={() => handleFilterChange("status", "")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                {filters.producer && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    <span>Producer: {filters.producer}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-5 w-5 p-0 ml-1"
+                      onClick={() => handleFilterChange("producer", "")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                {filters.origin && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    <span>Origin: {filters.origin}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-5 w-5 p-0 ml-1"
+                      onClick={() => handleFilterChange("origin", "")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                <Button 
+                  variant="link" 
+                  size="sm" 
+                  onClick={resetFilters}
+                  className="text-guardian-green-600 h-7 px-3 py-1"
+                >
+                  Clear All
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
         
@@ -137,7 +388,7 @@ const Products = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8">
-                      No products found matching your search.
+                      No products found matching your search criteria.
                     </TableCell>
                   </TableRow>
                 )}
