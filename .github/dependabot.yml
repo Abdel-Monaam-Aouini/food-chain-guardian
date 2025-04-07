@@ -9,3 +9,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: feat
+      prefix-development: feat
+    open-pull-requests-limit: 99
