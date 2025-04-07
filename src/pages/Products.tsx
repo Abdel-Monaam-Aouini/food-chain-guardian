@@ -187,8 +187,8 @@ const Products = () => {
                         <SelectContent>
                           <SelectItem value="all-categories">All Categories</SelectItem>
                           {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
+                            <SelectItem key={category} value={category || "category-placeholder"}>
+                              {category || "Unknown Category"}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -207,8 +207,8 @@ const Products = () => {
                         <SelectContent>
                           <SelectItem value="all-statuses">All Statuses</SelectItem>
                           {statuses.map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {status}
+                            <SelectItem key={status} value={status || "status-placeholder"}>
+                              {status || "Unknown Status"}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -227,8 +227,8 @@ const Products = () => {
                         <SelectContent>
                           <SelectItem value="all-producers">All Producers</SelectItem>
                           {producers.map((producer) => (
-                            <SelectItem key={producer} value={producer}>
-                              {producer}
+                            <SelectItem key={producer} value={producer || "producer-placeholder"}>
+                              {producer || "Unknown Producer"}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -247,8 +247,8 @@ const Products = () => {
                         <SelectContent>
                           <SelectItem value="all-origins">All Origins</SelectItem>
                           {origins.map((origin) => (
-                            <SelectItem key={origin} value={origin}>
-                              {origin}
+                            <SelectItem key={origin} value={origin || "origin-placeholder"}>
+                              {origin || "Unknown Origin"}
                             </SelectItem>
                           ))}
                         </SelectContent>
