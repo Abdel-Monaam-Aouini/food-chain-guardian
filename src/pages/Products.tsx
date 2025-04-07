@@ -41,10 +41,10 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
-    category: "",
-    status: "",
-    producer: "",
-    origin: "",
+    category: "all-categories",
+    status: "all-statuses",
+    producer: "all-producers",
+    origin: "all-origins",
     dateRange: [0, 100] // Represents a percentage range for dates
   });
   
@@ -63,10 +63,10 @@ const Products = () => {
   
   const resetFilters = () => {
     setFilters({
-      category: "",
-      status: "",
-      producer: "",
-      origin: "",
+      category: "all-categories",
+      status: "all-statuses",
+      producer: "all-producers",
+      origin: "all-origins",
       dateRange: [0, 100]
     });
   };
@@ -80,16 +80,16 @@ const Products = () => {
       product.origin.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Apply category filter
-    const matchesCategory = !filters.category || product.category === filters.category;
+    const matchesCategory = filters.category === "all-categories" || product.category === filters.category;
     
     // Apply status filter
-    const matchesStatus = !filters.status || product.status === filters.status;
+    const matchesStatus = filters.status === "all-statuses" || product.status === filters.status;
     
     // Apply producer filter
-    const matchesProducer = !filters.producer || product.producer === filters.producer;
+    const matchesProducer = filters.producer === "all-producers" || product.producer === filters.producer;
     
     // Apply origin filter
-    const matchesOrigin = !filters.origin || product.origin === filters.origin;
+    const matchesOrigin = filters.origin === "all-origins" || product.origin === filters.origin;
     
     // Apply date range filter (simplified for demo)
     // This assumes harvest dates are in format MM/DD/YYYY
@@ -99,9 +99,13 @@ const Products = () => {
            matchesProducer && matchesOrigin && matchesDateRange;
   });
 
-  const activeFilterCount = Object.values(filters).filter(val => 
-    val !== "" && (Array.isArray(val) ? val[0] !== 0 || val[1] !== 100 : true)
-  ).length;
+  const activeFilterCount = Object.values(filters).filter(val => {
+    if (Array.isArray(val)) {
+      return val[0] !== 0 || val[1] !== 100;
+    }
+    return val !== "all-categories" && val !== "all-statuses" && 
+           val !== "all-producers" && val !== "all-origins";
+  }).length;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -181,7 +185,7 @@ const Products = () => {
                           <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Categories</SelectItem>
+                          <SelectItem value="all-categories">All Categories</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
@@ -201,7 +205,7 @@ const Products = () => {
                           <SelectValue placeholder="All Statuses" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Statuses</SelectItem>
+                          <SelectItem value="all-statuses">All Statuses</SelectItem>
                           {statuses.map((status) => (
                             <SelectItem key={status} value={status}>
                               {status}
@@ -221,7 +225,7 @@ const Products = () => {
                           <SelectValue placeholder="All Producers" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Producers</SelectItem>
+                          <SelectItem value="all-producers">All Producers</SelectItem>
                           {producers.map((producer) => (
                             <SelectItem key={producer} value={producer}>
                               {producer}
@@ -241,7 +245,7 @@ const Products = () => {
                           <SelectValue placeholder="All Origins" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Origins</SelectItem>
+                          <SelectItem value="all-origins">All Origins</SelectItem>
                           {origins.map((origin) => (
                             <SelectItem key={origin} value={origin}>
                               {origin}
@@ -266,53 +270,53 @@ const Products = () => {
             
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
-                {filters.category && (
+                {filters.category !== "all-categories" && (
                   <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
                     <span>Category: {filters.category}</span>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className="h-5 w-5 p-0 ml-1"
-                      onClick={() => handleFilterChange("category", "")}
+                      onClick={() => handleFilterChange("category", "all-categories")}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 )}
-                {filters.status && (
+                {filters.status !== "all-statuses" && (
                   <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
                     <span>Status: {filters.status}</span>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className="h-5 w-5 p-0 ml-1"
-                      onClick={() => handleFilterChange("status", "")}
+                      onClick={() => handleFilterChange("status", "all-statuses")}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 )}
-                {filters.producer && (
+                {filters.producer !== "all-producers" && (
                   <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
                     <span>Producer: {filters.producer}</span>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className="h-5 w-5 p-0 ml-1"
-                      onClick={() => handleFilterChange("producer", "")}
+                      onClick={() => handleFilterChange("producer", "all-producers")}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 )}
-                {filters.origin && (
+                {filters.origin !== "all-origins" && (
                   <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
                     <span>Origin: {filters.origin}</span>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className="h-5 w-5 p-0 ml-1"
-                      onClick={() => handleFilterChange("origin", "")}
+                      onClick={() => handleFilterChange("origin", "all-origins")}
                     >
                       <X className="h-3 w-3" />
                     </Button>
