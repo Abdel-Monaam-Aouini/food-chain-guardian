@@ -1,6 +1,7 @@
 
 import { Search, Bell, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 w-full">
@@ -40,18 +42,18 @@ const NavBar = () => {
               <span className="ml-2 text-xl font-bold text-gray-900">FoodGuardian</span>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <a
-                href="#"
+              <Link
+                to="/"
                 className="border-guardian-green-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
                 Dashboard
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/products"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
                 Products
-              </a>
+              </Link>
               <a
                 href="#"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -95,6 +97,7 @@ const NavBar = () => {
             <Button 
               variant="default" 
               className="bg-guardian-green-500 hover:bg-guardian-green-600 text-white"
+              onClick={() => navigate("/add-product")}
             >
               Add Product
             </Button>
@@ -124,18 +127,18 @@ const NavBar = () => {
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <a
-              href="#"
+            <Link
+              to="/"
               className="bg-guardian-green-50 border-guardian-green-500 text-guardian-green-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
             >
               Dashboard
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/products"
               className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
             >
               Products
-            </a>
+            </Link>
             <a
               href="#"
               className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
@@ -164,6 +167,7 @@ const NavBar = () => {
               <Button 
                 variant="default" 
                 className="w-full bg-guardian-green-500 hover:bg-guardian-green-600 text-white"
+                onClick={() => navigate("/add-product")}
               >
                 Add Product
               </Button>
